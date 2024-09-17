@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rich Client!</title>
+
+</head>
+<body>
+
+<h1>"Rich" Client for <i>Simple HTTP Server</i></h1>
+<h2>View the "Hello" Message</h2>
+<p><button id="btn-hello">See contents of <kbd>/helloJSON</kbd></button></p>
+<div id="output-hello">???</div>
+
+<hr>
+
+<h2>View the "Current Time" Message</h2>
+
+<p><button id="btn-time">See contents of <kbd>/time</kbd></button></p>
+<div id="output-time">???</div>
+
+<hr>
+
+<h2>A Dank Meme ...</h2>
+
+<img id = "dank-meme" width = "200" alt = "dank meme :D">
+  
+</body>
+<script>
+const getJsonFetch = async (url, callback) => {
+  let json;
+  try{
+    const response = await fetch(url,{
+      method: "GET",
+      headers: {
+        "Accept": "application/json"
+      }
+    });
+    json = await response.json();
+  }
+  catch(error){
+    console.log("ERROR:", error);
+    json = {author: `Can't parse data file '${url}'`};
+  }
+  callback(json);
+};
+
+const getTextFetch = async (url, callback) => {
+  let text;
+  try{
+    const response = await fetch(url,{
+      method: "GET",
+      headers: {
+        "Accept": "text/plain"
+      }
+    });
+    text = await response.text();
+  }
+  catch(error){
+    console.log("ERROR:", error);
+    text = "NOT FOUND";
+  }
+  callback(text);
+};
+
+const getImageFetch = async (url, callback) => {
+  let img;
+  try{
+    const response = await fetch(url,{
+      method: "GET",
+      headers: {
+        "Accept": "image/png"
+      }
+    });
+    img = await response;
+  }
+  catch(error){
+    console.log("ERROR:", error);
+    img = "NOT FOUND";
+  }
+  callback(img);
+};
+
+const btnHello = document.querySelector("#btn-hello");
+const outputHello = document.querySelector("#output-hello");
+
+const helloJSONURL = "/helloJSON";
+const helloCallback = json => {
+  outputHello.innerHTML = json.message || "No <kbd>.message</kbd> value found!";
+};
+
+const btnTime = document.querySelector("#btn-time");
+const outputTime = document.querySelector("#output-time");
+
+const timeUrl = "/timeJSON";
+const timeCallback = json => {
+    outputTime.innerHTML = json.time || "No <kbd>.message</kbd> value found!";
+}
+
+const dankMeme = document.querySelector("#dank-meme");
+const memeUrl = "/dankmemes";
+const memeCallback = img => {
+    console.log(img);
+    dankMeme.src = img.url;
+}
+
+getImageFetch(memeUrl, memeCallback);
+
+
+btnHello.onclick = () => getJsonFetch(helloJSONURL, helloCallback);
+btnTime.onclick = () => getJsonFetch(timeUrl, timeCallback);
+
+
+</script>
+</html>
